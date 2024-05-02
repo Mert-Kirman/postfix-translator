@@ -30,58 +30,58 @@ _start:
     lea input_buffer(%rip), %r8
     lea output_buffer(%rip), %r9
 
-    mov $0, %ax
+    mov $0, %rax
     jmp process_next_unit
-
-    call print_func
 
 process_next_unit:                  # Decide which action to take
     mov $0, %r11
     mov $0, %r12
 
     # Check if end of line
-    cmp $'\n', (%r8)
+    cmpb $'\n', (%r8)
     je exit_program
 
     # Check if whitespace
-    cmp $32, (%r8)
+    cmpb $32, (%r8)
     je get_next_decimal
 
     # Check if operation
-    cmp $43, (%r8)
+    cmpb $43, (%r8)
     je add_operation
 
-    cmp $45, (%r8)
+    cmpb $45, (%r8)
     je sub_operation
 
-    cmp $42, (%r8)
+    cmpb $42, (%r8)
     je mul_operation
 
-    cmp $94, (%r8)
+    cmpb $94, (%r8)
     je xor_operation
 
-    cmp $38, (%r8)
+    cmpb $38, (%r8)
     je and_operation
 
-    cmp $124, (%r8)
+    cmpb $124, (%r8)
     je or_operation
 
     # Else, this is a number
     jmp get_decimal_number
 
 get_decimal_number:                 # Current character is a number
-    mul $10, %ax                    # Accumulate the result in register ax
+    mov $0, %rcx
+    mov $10, %rcx
+    mul %rcx                         # Accumulate the result in register ax
     mov $0, %r10
     mov (%r8), %r10
     sub $48, %r10
-    add %r10, %ax
+    add %r10, %rax
     inc %r8
     jmp process_next_unit
 
 
 get_next_decimal:                   # Current character is white space
-    push %ax
-    mov $0, %ax
+    push %rax
+    mov $0, %rax
     inc %r8
     jmp process_next_unit
 
@@ -117,6 +117,7 @@ add_operation:
 
     add %r12, %r11
     push %r11
+    inc %r8
     jmp process_next_unit
 
 sub_operation:
@@ -151,6 +152,7 @@ sub_operation:
 
     sub %r12, %r11
     push %r11
+    inc %r8
     jmp process_next_unit
 
 mul_operation:
@@ -183,8 +185,11 @@ mul_operation:
     mov $31, %edx
     call print_func
 
-    mul %r12, %r11
-    push %r11
+    mov $0, %rax
+    mov %r11, %rax
+    mul %r12                # Multiply value in rax with the value in r12
+    push %rax
+    inc %r8
     jmp process_next_unit
 
 xor_operation:
@@ -219,6 +224,7 @@ xor_operation:
     
     xor %r12, %r11
     push %r11
+    inc %r8
     jmp process_next_unit
 
 and_operation:
@@ -253,6 +259,7 @@ and_operation:
 
     and %r12, %r11
     push %r11
+    inc %r8
     jmp process_next_unit
 
 or_operation:
@@ -287,6 +294,7 @@ or_operation:
 
     or %r12, %r11
     push %r11
+    inc %r8
     jmp process_next_unit
 
 decimal_to_binary:              # Function that converts a decimal number to a binary number
