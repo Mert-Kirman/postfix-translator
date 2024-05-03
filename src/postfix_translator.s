@@ -21,10 +21,10 @@ or_op_binary: .string "0000110"
 
 _start:
     # Read input from standard input
-    mov $0, %eax                    # syscall number for sys_read
-    mov $0, %edi                    # file descriptor 0 (stdin)
+    mov $0, %rax                    # syscall number for sys_read
+    mov $0, %rdi                    # file descriptor 0 (stdin)
     lea input_buffer(%rip), %rsi    # pointer to the input buffer
-    mov $256, %edx                  # maximum number of bytes to read
+    mov $256, %rdx                  # maximum number of bytes to read
     syscall                         # perform the syscall
 
     lea input_buffer(%rip), %r8
@@ -91,10 +91,10 @@ add_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -102,17 +102,17 @@ add_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea add_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
 
     add %r12, %r11
@@ -134,10 +134,10 @@ sub_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -145,17 +145,17 @@ sub_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea sub_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
 
     sub %r12, %r11
@@ -177,10 +177,10 @@ mul_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -188,17 +188,17 @@ mul_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea mul_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
 
     mov $0, %rax
@@ -222,10 +222,10 @@ xor_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -233,17 +233,17 @@ xor_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea xor_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
     
     xor %r12, %r11
@@ -265,10 +265,10 @@ and_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -276,17 +276,17 @@ and_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea and_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
 
     and %r12, %r11
@@ -308,10 +308,10 @@ or_operation:
     mov %r12, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_first_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     pop %r11
@@ -319,17 +319,17 @@ or_operation:
     mov %r11, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
-    mov $12, %edx
+    mov $12, %rdx
     call print_func
     lea i_format_second_instruction(%rip), %rsi
-    mov $25, %edx
+    mov $25, %rdx
     call print_func
 
     lea or_op_binary(%rip), %rsi
-    mov $7, %edx
+    mov $7, %rdx
     call print_func
     lea r_format_instruction(%rip), %rsi
-    mov $31, %edx
+    mov $31, %rdx
     call print_func
 
     or %r12, %r11
@@ -377,15 +377,15 @@ after_jc:
     ret
 
 print_func:
-    mov $1, %eax              # syscall number for sys_write
-    mov $1, %edi              # file descriptor 1 (stdout)
+    mov $1, %rax              # syscall number for sys_write
+    mov $1, %rdi              # file descriptor 1 (stdout)
     syscall
     mov $0, %rsi
-    mov $0, %edx
+    mov $0, %rdx
     ret
 
 exit_program:
     # Exit the program
-    mov $60, %eax               # syscall number for sys_exit
-    xor %edi, %edi              # exit code 0
+    mov $60, %rax               # syscall number for sys_exit
+    xor %rdi, %rdi              # exit code 0
     syscall
