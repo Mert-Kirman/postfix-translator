@@ -1,6 +1,6 @@
 .section .bss
 input_buffer: .space 256            # Allocate 256 bytes for input buffer
-output_buffer: .space 12
+output_buffer: .space 16
 
 .section .data
 # I format variables for printing
@@ -31,6 +31,7 @@ _start:
     lea output_buffer(%rip), %r9
 
     mov $0, %rax
+    mov $0, %r15
     jmp process_next_unit
 
 process_next_unit:                  # Decide which action to take
@@ -46,41 +47,47 @@ process_next_unit:                  # Decide which action to take
     je get_next_decimal
 
     # Check if operation
-    cmpb $43, (%r8)
+    cmpb $'+', (%r8)
     je add_operation
 
-    cmpb $45, (%r8)
+    cmpb $'-', (%r8)
     je sub_operation
 
-    cmpb $42, (%r8)
+    cmpb $'*', (%r8)
     je mul_operation
 
-    cmpb $94, (%r8)
+    cmpb $'^', (%r8)
     je xor_operation
 
-    cmpb $38, (%r8)
+    cmpb $'&', (%r8)
     je and_operation
 
-    cmpb $124, (%r8)
+    cmpb $'|', (%r8)
     je or_operation
 
     # Else, this is a number
     jmp get_decimal_number
 
 get_decimal_number:                 # Current character is a number
+    mov $0, %rax
+    add %r15, %rax
     mov $0, %rcx
     mov $10, %rcx
-    mul %rcx                         # Accumulate the result in register rax
+    mul %rcx                         
+    mov $0, %r15
+    mov %rax, %r15                  # Accumulate the result in register r15
     mov $0, %r10
     mov (%r8), %r10
-    sub $48, %r10
-    add %r10, %rax
+    sub $'0', %r10                  # Convert from ascii to decimal
+    add %r10, %r15
     inc %r8
     jmp process_next_unit
 
 
 get_next_decimal:                   # Current character is white space
-    push %rax
+    push %r15
+    mov $0, %r15
+    mov $0, %r10
     mov $0, %rax
     inc %r8
     jmp process_next_unit
@@ -93,6 +100,7 @@ add_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -104,6 +112,7 @@ add_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -136,6 +145,7 @@ sub_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -147,6 +157,7 @@ sub_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -179,6 +190,7 @@ mul_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -190,6 +202,7 @@ mul_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -224,6 +237,7 @@ xor_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -235,6 +249,7 @@ xor_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -267,6 +282,7 @@ and_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -278,6 +294,7 @@ and_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -310,6 +327,7 @@ or_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_first_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -321,6 +339,7 @@ or_operation:
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
     call print_func
+    lea output_buffer(%rip), %r9
     lea i_format_second_instruction(%rip), %rsi
     mov $25, %rdx
     call print_func
@@ -345,36 +364,30 @@ or_operation:
 
     jmp process_next_unit
 
-decimal_to_binary:              # Function that converts a decimal number to a binary number
-    push $11                    # Set a counter to loop 12 times, keep this counter in stack
+decimal_to_binary:                  # Function that converts a decimal number to a binary number
+    mov $12, %r15                   # Set a counter to loop 12 times, keep this counter in stack
     add $11, %r9
 
 loop_part:
+    sub $1, %r15
     shr $1, %r13   
     jc carry_flag_1
     jmp carry_flag_0
 
 carry_flag_1:
-    movb $49, (%r9)
+    movb $'1', (%r9)
     dec %r9
     jmp after_jc
 
 carry_flag_0:
-    movb $48, (%r9)
+    movb $'0', (%r9)
     dec %r9
 
 after_jc:
-    mov $0, %rax                # Loop until all 12 bytes of the output buffer are filled with ascii values (until counter is 0)
-    pop %rax                    # Put the counter value into %rax
-    cmp $0, %rax                # If counter is zero, loop back to decimal_to_binary
-    sub $1, %rax
-    push %rax
-    ja loop_part
-    
-    pop %rax                    # If looped 12 times, return
-    mov $0, %rax
+    cmp $0, %r15                # Loop until all 12 bytes of the output buffer are filled with ascii values (until counter is 0)
+    ja loop_part                # If counter is zero, loop back to decimal_to_binary
 
-    ret
+    ret                         # If looped 12 times, return
 
 print_func:
     mov $1, %rax              # syscall number for sys_write
