@@ -1,6 +1,6 @@
 .section .bss
 input_buffer: .space 256            # Allocate 256 bytes for input buffer
-output_buffer: .space 256
+output_buffer: .space 12
 
 .section .data
 # I format variables for printing
@@ -42,7 +42,7 @@ process_next_unit:                  # Decide which action to take
     je exit_program
 
     # Check if whitespace
-    cmpb $32, (%r8)
+    cmpb $' ', (%r8)
     je get_next_decimal
 
     # Check if operation
@@ -70,7 +70,7 @@ process_next_unit:                  # Decide which action to take
 get_decimal_number:                 # Current character is a number
     mov $0, %rcx
     mov $10, %rcx
-    mul %rcx                         # Accumulate the result in register ax
+    mul %rcx                         # Accumulate the result in register rax
     mov $0, %r10
     mov (%r8), %r10
     sub $48, %r10
@@ -118,6 +118,14 @@ add_operation:
     add %r12, %r11
     push %r11
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax                # Clean contents of %rax to prevent multiplying garbuage value inside in the get_decimal_number label
+
     jmp process_next_unit
 
 sub_operation:
@@ -153,6 +161,14 @@ sub_operation:
     sub %r12, %r11
     push %r11
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax
+
     jmp process_next_unit
 
 mul_operation:
@@ -190,6 +206,14 @@ mul_operation:
     mul %r12                # Multiply value in rax with the value in r12
     push %rax
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax
+
     jmp process_next_unit
 
 xor_operation:
@@ -225,6 +249,14 @@ xor_operation:
     xor %r12, %r11
     push %r11
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax
+
     jmp process_next_unit
 
 and_operation:
@@ -260,6 +292,14 @@ and_operation:
     and %r12, %r11
     push %r11
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax
+
     jmp process_next_unit
 
 or_operation:
@@ -295,10 +335,45 @@ or_operation:
     or %r12, %r11
     push %r11
     inc %r8
+
+    # Check if end of line
+    cmpb $'\n', (%r8)           # The next character is new line character, so the program terminates
+    je exit_program
+
+    inc %r8                     # The next character after the operator is whitespace so bypass it
+    mov $0, %rax
+
     jmp process_next_unit
 
 decimal_to_binary:              # Function that converts a decimal number to a binary number
-    # IMPLEMENT
+    push $11                    # Set a counter to loop 12 times, keep this counter in stack
+    add $11, %r9
+
+loop_part:
+    shr $1, %r13   
+    jc carry_flag_1
+    jmp carry_flag_0
+
+carry_flag_1:
+    movb $49, (%r9)
+    dec %r9
+    jmp after_jc
+
+carry_flag_0:
+    movb $48, (%r9)
+    dec %r9
+
+after_jc:
+    mov $0, %rax                # Loop until all 12 bytes of the output buffer are filled with ascii values (until counter is 0)
+    pop %rax                    # Put the counter value into %rax
+    cmp $0, %rax                # If counter is zero, loop back to decimal_to_binary
+    sub $1, %rax
+    push %rax
+    ja loop_part
+    
+    pop %rax                    # If looped 12 times, return
+    mov $0, %rax
+
     ret
 
 print_func:
