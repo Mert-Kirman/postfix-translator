@@ -1,10 +1,10 @@
 .section .bss
 input_buffer: .space 256            # Allocate 256 bytes for input buffer
-output_buffer: .space 16
+output_buffer: .space 12
 
 .section .data
 # I format variables for printing
-i_format_first_instruction: .string " 00000 000 00010 0010011\n"  # also try .asciz
+i_format_first_instruction: .string " 00000 000 00010 0010011\n"
 i_format_second_instruction: .string " 00000 000 00001 0010011\n"
 
 # R format variables for printing
@@ -70,19 +70,15 @@ process_next_unit:                  # Decide which action to take
 
 get_decimal_number:                 # Current character is a number
     mov $0, %rax
-    add %r15, %rax
-    mov $0, %rcx
-    mov $10, %rcx
-    mul %rcx                         
-    mov $0, %r15
-    mov %rax, %r15                  # Accumulate the result in register r15
+    mov $0, %rdx
+
+    imul $10, %r15                  # Accumulate the result in register r15
     mov $0, %r10
     mov (%r8), %r10
-    sub $'0', %r10                  # Convert from ascii to decimal
+    sub $'0', %r10
     add %r10, %r15
     inc %r8
     jmp process_next_unit
-
 
 get_next_decimal:                   # Current character is white space
     push %r15
