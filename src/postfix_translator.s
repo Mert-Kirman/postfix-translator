@@ -32,6 +32,7 @@ _start:
 
     mov $0, %rax
     mov $0, %r15
+    xorq %rbx, %rbx
     jmp process_next_unit
 
 process_next_unit:                  # Decide which action to take
@@ -70,22 +71,20 @@ process_next_unit:                  # Decide which action to take
 
 get_decimal_number:                 # Current character is a number
     mov $0, %rax
-    mov $0, %rdx
+    movb (%r8), %al
+    imulq $10, %rbx
+    movzbq %al, %rax
+    subq $'0', %rax
+    addq %rax, %rbx                 # Accumulate the result in register rbx
 
-    imul $10, %r15                  # Accumulate the result in register r15
-    mov $0, %r10
-    mov (%r8), %r10
-    sub $'0', %r10
-    add %r10, %r15
-    inc %r8
+    incq %r8
     jmp process_next_unit
 
 get_next_decimal:                   # Current character is white space
-    push %r15
-    mov $0, %r15
-    mov $0, %r10
+    push %rbx
+    mov $0, %rbx
     mov $0, %rax
-    inc %r8
+    incq %r8
     jmp process_next_unit
 
 add_operation:
