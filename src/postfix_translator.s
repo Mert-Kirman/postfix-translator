@@ -36,7 +36,7 @@ _start:
     jmp process_next_unit
 
 process_next_unit:                                  # Decide which action to take
-    mov $0, %r11
+    mov $0, %r14
     mov $0, %r12
 
     # Check if end of line
@@ -100,9 +100,9 @@ add_operation:
     call print_func                                 # Print the i-format instruction's remanining part
 
     # Below is the same process but for the first decimal number, so above comments apply to this section too
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -119,8 +119,8 @@ add_operation:
     mov $31, %rdx
     call print_func                                 # Print the r-format instruction's remanining part
 
-    add %r12, %r11                                  # Do the operation
-    push %r11                                       # Push the result of the operation to stack
+    add %r12, %r14                                  # Do the operation
+    push %r14                                       # Push the result of the operation to stack
     inc %r8
 
     # Check if end of line
@@ -146,9 +146,9 @@ sub_operation:
     mov $25, %rdx
     call print_func
 
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -165,8 +165,8 @@ sub_operation:
     mov $31, %rdx
     call print_func
 
-    sub %r12, %r11
-    push %r11
+    sub %r12, %r14
+    push %r14
     inc %r8
 
     # Check if end of line
@@ -192,9 +192,9 @@ mul_operation:
     mov $25, %rdx
     call print_func
 
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -212,7 +212,7 @@ mul_operation:
     call print_func
 
     mov $0, %rax
-    mov %r11, %rax
+    mov %r14, %rax
     mul %r12                                  # Multiply value in rax with the value in r12
     push %rax
     inc %r8
@@ -240,9 +240,9 @@ xor_operation:
     mov $25, %rdx
     call print_func
 
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -259,8 +259,8 @@ xor_operation:
     mov $31, %rdx
     call print_func
     
-    xor %r12, %r11
-    push %r11
+    xor %r12, %r14
+    push %r14
     inc %r8
 
     # Check if end of line
@@ -286,9 +286,9 @@ and_operation:
     mov $25, %rdx
     call print_func
 
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -305,8 +305,8 @@ and_operation:
     mov $31, %rdx
     call print_func
 
-    and %r12, %r11
-    push %r11
+    and %r12, %r14
+    push %r14
     inc %r8
 
     # Check if end of line
@@ -332,9 +332,9 @@ or_operation:
     mov $25, %rdx
     call print_func
 
-    pop %r11
+    pop %r14
     mov $0, %r13
-    mov %r11, %r13
+    mov %r14, %r13
     call decimal_to_binary
     lea output_buffer(%rip), %rsi
     mov $12, %rdx
@@ -351,8 +351,8 @@ or_operation:
     mov $31, %rdx
     call print_func
 
-    or %r12, %r11
-    push %r11
+    or %r12, %r14
+    push %r14
     inc %r8
 
     # Check if end of line
